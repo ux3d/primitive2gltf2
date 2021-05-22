@@ -5,9 +5,10 @@
 primitive2gltf2 is a command line tool for generating primitive glTF 2.0 content.  
 A cube can be generated.  
 
-Usage: `primitive2gltf2.exe [-p cube]`  
+Usage: `primitive2gltf2.exe [-p cube -s 1.0]`  
 
 `-p cube` Default generated primitive `cube`.  
+`-s 1.0` Default scale.  
 
 
 ## Software Requirements

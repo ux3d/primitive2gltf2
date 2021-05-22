@@ -70,9 +70,44 @@ bool saveFile(const std::string& output, const std::string& filename)
 	return true;
 }
 
+void applyScale(json& glTF, std::vector<float>& vertices, float scale)
+{
+	float minimum[3];
+	float maximum[3];
+
+	size_t counter = 0;
+	for (float& f : vertices)
+	{
+		f *= scale;
+
+		if (counter < 3)
+		{
+			minimum[counter%3] = f;
+			maximum[counter%3] = f;
+		}
+		else
+		{
+			minimum[counter%3] = minf(minimum[counter%3], f);
+			maximum[counter%3] = maxf(maximum[counter%3], f);
+		}
+
+		counter++;
+	}
+
+    glTF["accessors"][0]["min"][0] = minimum[0];
+    glTF["accessors"][0]["min"][1] = minimum[1];
+    glTF["accessors"][0]["min"][2] = minimum[2];
+
+    glTF["accessors"][0]["max"][0] = maximum[0];
+    glTF["accessors"][0]["max"][1] = maximum[1];
+    glTF["accessors"][0]["max"][2] = maximum[2];
+}
+
 int main(int argc, char *argv[])
 {
 	std::string primitive = "cube";
+
+	float scale = 1.0f;
 
 	//
 
@@ -84,17 +119,24 @@ int main(int argc, char *argv[])
 			{
 				primitive = "cube";
 			}
+			else
 			{
 				printf("Error: Unknown primitive '%s'\n", argv[i + 1]);
 
 				return -1;
 			}
 		}
+		else if (strcmp(argv[i], "-s") == 0 && (i + 1 < argc))
+		{
+			scale = std::stof(argv[i + 1]);
+		}
 	}
 
 	//
 
 	std::string generatorname = primitive;
+
+	generatorname += "_s" + std::to_string(scale);
 
 	std::string loadname = "template.gltf";
     std::string savename = generatorname + ".gltf";
@@ -160,6 +202,8 @@ int main(int argc, char *argv[])
 				+1.0f, +1.0f, -1.0f
         };
 
+        applyScale(glTF, vertices, scale);
+
         floatData.insert(floatData.end(), vertices.begin(), vertices.end());
 
         glTF["accessors"][0]["count"] = numberAttributes;
@@ -203,8 +247,6 @@ int main(int argc, char *argv[])
 				+1.0f, 0.0f, 0.0f,
 				+1.0f, 0.0f, 0.0f,
 				+1.0f, 0.0f, 0.0f
-
-			//
         };
 
         floatData.insert(floatData.end(), normals.begin(), normals.end());
@@ -287,6 +329,9 @@ int main(int argc, char *argv[])
     memcpy(&data.data()[floatData.size() * sizeof(float)], shortData.data(), shortData.size() * sizeof(uint16_t));
 
     glTF["buffers"][0]["byteLength"] = data.size();
+
+    glTF["materials"][0]["name"] = generatorname;
+    glTF["meshes"][0]["name"] = generatorname;
 
 	if (!saveFile(data, binaryname))
 	{
