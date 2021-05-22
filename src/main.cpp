@@ -119,6 +119,10 @@ int main(int argc, char *argv[])
 			{
 				primitive = "cube";
 			}
+			else if (strcmp(argv[i + 1], "plane") == 0)
+			{
+				primitive = "plane";
+			}
 			else
 			{
 				printf("Error: Unknown primitive '%s'\n", argv[i + 1]);
@@ -321,6 +325,97 @@ int main(int argc, char *argv[])
         glTF["bufferViews"][3]["byteOffset"] = byteOffset;
 
         byteOffset += byteLength;
+    }
+    else if (primitive == "plane")
+    {
+    	size_t numberAttributes = 4;
+    	size_t numberIndices = 6;
+
+        size_t byteOffset = 0;
+        size_t byteLength = 0;
+
+        //
+
+        std::vector<float> vertices = {
+        		-1.0f, 0.0f, -1.0f,
+				-1.0f, 0.0f, +1.0f,
+				+1.0f, 0.0f, -1.0f,
+				+1.0f, 0.0f, +1.0f
+        };
+
+        applyScale(glTF, vertices, scale);
+
+        floatData.insert(floatData.end(), vertices.begin(), vertices.end());
+
+        glTF["accessors"][0]["count"] = numberAttributes;
+
+        byteLength = numberAttributes * 3 * sizeof(float);
+
+        glTF["bufferViews"][0]["byteLength"] = byteLength;
+        glTF["bufferViews"][0]["byteOffset"] = byteOffset;
+
+        byteOffset += byteLength;
+
+        //
+
+        std::vector<float> normals = {
+        		0.0f, +1.0f, 0.0f,
+				0.0f, +1.0f, 0.0f,
+				0.0f, +1.0f, 0.0f,
+				0.0f, +1.0f, 0.0f
+        };
+
+        floatData.insert(floatData.end(), normals.begin(), normals.end());
+
+        glTF["accessors"][1]["count"] = numberAttributes;
+
+        byteLength = numberAttributes * 3 * sizeof(float);
+
+        glTF["bufferViews"][1]["byteLength"] = byteLength;
+        glTF["bufferViews"][1]["byteOffset"] = byteOffset;
+
+        byteOffset += byteLength;
+
+        //
+
+        std::vector<float> texCoords = {
+        		0.0f, 1.0f,
+				0.0f, 0.0f,
+				1.0f, 1.0f,
+				1.0f, 0.0f
+        };
+
+        floatData.insert(floatData.end(), texCoords.begin(), texCoords.end());
+
+        glTF["accessors"][2]["count"] = numberAttributes;
+
+        byteLength = numberAttributes * 2 * sizeof(float);
+
+        glTF["bufferViews"][2]["byteLength"] = byteLength;
+        glTF["bufferViews"][2]["byteOffset"] = byteOffset;
+
+        byteOffset += byteLength;
+
+        //
+
+        std::vector<uint16_t> indices = {
+        		0, 1, 2, 3, 2, 1
+        };
+
+        shortData.insert(shortData.end(), indices.begin(), indices.end());
+
+        glTF["accessors"][3]["count"] = numberIndices;
+
+        byteLength = numberIndices * 1 * sizeof(uint16_t);
+
+        glTF["bufferViews"][3]["byteLength"] = byteLength;
+        glTF["bufferViews"][3]["byteOffset"] = byteOffset;
+
+        byteOffset += byteLength;
+
+        //
+
+        glTF["materials"][0]["doubleSided"] = true;
     }
 
     std::string data;

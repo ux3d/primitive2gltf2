@@ -5,7 +5,8 @@
     },
     "materials" : [
         {
-			"name" : "Cube"
+			"name" : "Cube",
+			"doubleSided" : false
         }
     ],
     "meshes" : [

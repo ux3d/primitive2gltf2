@@ -7,7 +7,7 @@ A cube can be generated.
 
 Usage: `primitive2gltf2.exe [-p cube -s 1.0]`  
 
-`-p cube` Default generated primitive `cube`.  
+`-p cube` Default generated primitive `cube`. Alternatives `plane`.  
 `-s 1.0` Default scale.  
 
 
