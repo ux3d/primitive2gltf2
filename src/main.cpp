@@ -110,6 +110,7 @@ int main(int argc, char *argv[])
 	float scale = 1.0f;
 
 	const size_t numberSlices = 64;
+	const size_t numberStacks = 64;
 
 	//
 
@@ -128,6 +129,10 @@ int main(int argc, char *argv[])
 			else if (strcmp(argv[i + 1], "sphere") == 0)
 			{
 				primitive = "sphere";
+			}
+			else if (strcmp(argv[i + 1], "torus") == 0)
+			{
+				primitive = "torus";
 			}
 			else
 			{
@@ -362,6 +367,81 @@ int main(int argc, char *argv[])
     	            indices[indexIndices++] = (i + 1) * (numberSlices + 1) + (j + 1);
     	            indices[indexIndices++] = i * (numberSlices + 1) + (j + 1);
 				}
+			}
+		}
+    }
+    else if (primitive == "torus")
+    {
+    	float outerRadius = scale;
+    	float innerRadius = scale / 4.0f;
+    	float torusRadius = (outerRadius - innerRadius) / 2.0f;
+    	float centerRadius = outerRadius - torusRadius;
+
+    	numberAttributes = (numberStacks + 1) * (numberSlices + 1);
+    	numberIndices = numberStacks * numberSlices * 2 * 3;
+
+		vertices.resize(3 * numberAttributes);
+		normals.resize(3 * numberAttributes);
+		texCoords.resize(2 * numberAttributes);
+		indices.resize(numberIndices);
+
+    	size_t indexVertices = 0;
+    	size_t indexNormals = 0;
+    	size_t indexTexCoords = 0;
+
+    	float sIncr = 1.0f / (float)numberSlices;
+    	float tIncr = 1.0f / (float)numberStacks;
+
+		float s = 0.0f;
+		for (size_t sideCount = 0; sideCount <= numberSlices; ++sideCount, s += sIncr)
+		{
+			float cos2PIs = cosf(2.0f * PI * s);
+			float sin2PIs = sinf(2.0f * PI * s);
+
+			float t = 0.0f;
+			for (size_t faceCount = 0; faceCount <= numberStacks; ++faceCount, t += tIncr)
+			{
+				float cos2PIt = cosf(2.0f * PI * t);
+				float sin2PIt = sinf(2.0f * PI * t);
+
+				indexVertices = ((sideCount * (numberStacks + 1)) + faceCount) * 3;
+				vertices[indexVertices + 0] = (centerRadius + torusRadius * cos2PIt) * sin2PIs;
+				vertices[indexVertices + 1] = torusRadius * sin2PIt;
+				vertices[indexVertices + 2] = (centerRadius + torusRadius * cos2PIt) * cos2PIs;
+
+				indexNormals = ((sideCount * (numberStacks + 1)) + faceCount) * 3;
+				normals[indexNormals + 0] = sin2PIs * cos2PIt;
+				normals[indexNormals + 1] = sin2PIt;
+				normals[indexNormals + 2] = cos2PIs * cos2PIt;
+
+				indexTexCoords = ((sideCount * (numberStacks + 1)) + faceCount) * 2;
+				texCoords[indexTexCoords + 0] = s;
+				texCoords[indexTexCoords + 1] = t;
+			}
+		}
+
+		//
+
+    	size_t v0, v1, v2, v3;
+
+		size_t indexIndices = 0;
+
+		for (size_t sideCount = 0; sideCount < numberSlices; ++sideCount)
+		{
+			for (size_t faceCount = 0; faceCount < numberStacks; ++faceCount)
+			{
+				v0 = ((sideCount * (numberStacks + 1)) + faceCount);
+				v1 = (((sideCount + 1) * (numberStacks + 1)) + faceCount);
+				v2 = (((sideCount + 1) * (numberStacks + 1)) + (faceCount + 1));
+				v3 = ((sideCount * (numberStacks + 1)) + (faceCount + 1));
+
+				indices[indexIndices++] = v0;
+				indices[indexIndices++] = v1;
+				indices[indexIndices++] = v2;
+
+				indices[indexIndices++] = v0;
+				indices[indexIndices++] = v2;
+				indices[indexIndices++] = v3;
 			}
 		}
     }
