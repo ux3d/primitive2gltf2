@@ -109,6 +109,8 @@ int main(int argc, char *argv[])
 
 	float scale = 1.0f;
 
+	const size_t numberSlices = 64;
+
 	//
 
 	for (int i = 0; i < argc; i++)
@@ -122,6 +124,10 @@ int main(int argc, char *argv[])
 			else if (strcmp(argv[i + 1], "plane") == 0)
 			{
 				primitive = "plane";
+			}
+			else if (strcmp(argv[i + 1], "sphere") == 0)
+			{
+				primitive = "sphere";
 			}
 			else
 			{
@@ -311,6 +317,53 @@ int main(int argc, char *argv[])
         };
 
         glTF["materials"][0]["doubleSided"] = true;
+    }
+    else if (primitive == "sphere")
+    {
+    	size_t numberParallels = numberSlices / 2;
+    	numberAttributes = (numberParallels + 1) * (numberSlices + 1);
+    	numberIndices = numberParallels * numberSlices * 6;
+
+    	float angleStep = (2.0f * PI) / (float)numberSlices;
+
+    	vertices.resize(3 * numberAttributes);
+    	normals.resize(3 * numberAttributes);
+    	texCoords.resize(2 * numberAttributes);
+    	indices.resize(numberIndices);
+
+    	size_t indexIndices = 0;
+
+		for (size_t i = 0; i < numberParallels + 1; i++)
+		{
+			for (size_t j = 0; j < numberSlices + 1; j++)
+			{
+				size_t vertexIndex = (i * (numberSlices + 1) + j) * 3;
+				size_t normalIndex = (i * (numberSlices + 1) + j) * 3;
+				size_t texCoordsIndex = (i * (numberSlices + 1) + j) * 2;
+
+				vertices[vertexIndex + 0] = scale * sinf(angleStep * (float)i) * sinf(angleStep * (float)j);
+				vertices[vertexIndex + 1] = scale * cosf(angleStep * (float)i);
+				vertices[vertexIndex + 2] = scale * sinf(angleStep * (float)i) * cosf(angleStep * (float)j);
+
+				normals[normalIndex + 0] = vertices[vertexIndex + 0] / scale;
+				normals[normalIndex + 1] = vertices[vertexIndex + 1] / scale;
+				normals[normalIndex + 2] = vertices[vertexIndex + 2] / scale;
+
+				texCoords[texCoordsIndex + 0] = (float)j / (float)numberSlices;
+				texCoords[texCoordsIndex + 1] = 1.0f - (float)i / (float)numberParallels;
+
+				if (i < numberParallels && j < numberSlices)
+				{
+    	            indices[indexIndices++] = i * (numberSlices + 1) + j;
+    	            indices[indexIndices++] = (i + 1) * (numberSlices + 1) + j;
+    	            indices[indexIndices++] = (i + 1) * (numberSlices + 1) + (j + 1);
+
+    	            indices[indexIndices++] = i * (numberSlices + 1) + j;
+    	            indices[indexIndices++] = (i + 1) * (numberSlices + 1) + (j + 1);
+    	            indices[indexIndices++] = i * (numberSlices + 1) + (j + 1);
+				}
+			}
+		}
     }
 
     //
