@@ -2,12 +2,12 @@
 
 # Generate primitive glTF 2.0 content
 
-primitive2gltf2 is a command line tool for generating primitive glTF 2.0 content.  
-A cube, plane, sphere and torus can be generated.  
+primitive2gltf2 is a command line tool for generating primitives for glTF 2.0.  
+A plane, disc, cube, sphere and torus can be generated. The glTF is minimalistic and valid.  
 
 Usage: `primitive2gltf2.exe [-p cube -s 1.0]`  
 
-`-p cube` Default generated primitive `cube`. Alternatives are `plane`, `sphere` and `torus`.  
+`-p cube` Default generated primitive `cube`. Alternatives are `plane`, `disc`, `sphere` and `torus`.  
 `-s 1.0` Default scale.  
 
 

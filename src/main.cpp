@@ -126,6 +126,10 @@ int main(int argc, char *argv[])
 			{
 				primitive = "plane";
 			}
+			else if (strcmp(argv[i + 1], "disc") == 0)
+			{
+				primitive = "disc";
+			}
 			else if (strcmp(argv[i + 1], "sphere") == 0)
 			{
 				primitive = "sphere";
@@ -320,6 +324,69 @@ int main(int argc, char *argv[])
         indices = {
         		0, 1, 2, 3, 2, 1
         };
+
+        glTF["materials"][0]["doubleSided"] = true;
+    }
+    else if (primitive == "disc")
+    {
+    	size_t numberSectors = numberSlices;
+
+    	numberAttributes = numberSectors + 2;
+    	numberIndices = numberSectors * 3;
+
+    	float angleStep = (2.0f * PI) / (float)numberSectors;
+
+    	vertices.resize(3 * numberAttributes);
+    	normals.resize(3 * numberAttributes);
+    	texCoords.resize(2 * numberAttributes);
+    	indices.resize(numberIndices);
+
+    	//
+
+    	size_t vertexCounter = 0;
+
+		vertices[vertexCounter * 3 + 0] = 0.0f;
+		vertices[vertexCounter * 3 + 1] = 0.0f;
+		vertices[vertexCounter * 3 + 2] = 0.0f;
+
+		normals[vertexCounter * 3 + 0] = 0.0f;
+		normals[vertexCounter * 3 + 1] = 1.0f;
+		normals[vertexCounter * 3 + 2] = 0.0f;
+
+		texCoords[vertexCounter * 2 + 0] = 0.5f;
+		texCoords[vertexCounter * 2 + 1] = 0.5f;
+
+    	vertexCounter++;
+
+		for (size_t i = 0; i < numberSectors + 1; i++)
+		{
+			float currentAngle = angleStep * (float)i;
+
+			vertices[vertexCounter * 3 + 0] = cosf(currentAngle) * scale;
+			vertices[vertexCounter * 3 + 1] = 0.0f;
+			vertices[vertexCounter * 3 + 2] = sinf(currentAngle) * scale;
+
+			normals[vertexCounter * 3 + 0] = 0.0f;
+			normals[vertexCounter * 3 + 1] = 1.0f;
+			normals[vertexCounter * 3 + 2] = 0.0f;
+
+			texCoords[vertexCounter * 2 + 0] = 0.5f + 0.5f * cosf(currentAngle);
+			texCoords[vertexCounter * 2 + 1] = 0.5f - 0.5f * sinf(currentAngle);
+
+			vertexCounter++;
+		}
+
+    	size_t indexIndices = 0;
+    	size_t indexCounter = 1;
+
+		for (size_t i = 0; i < numberSectors; i++)
+		{
+			indices[indexIndices++] = 0;
+			indices[indexIndices++] = indexCounter + 1;
+			indices[indexIndices++] = indexCounter;
+
+			indexCounter++;
+		}
 
         glTF["materials"][0]["doubleSided"] = true;
     }
