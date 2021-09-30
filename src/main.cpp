@@ -362,9 +362,9 @@ int main(int argc, char *argv[])
 		{
 			float currentAngle = angleStep * (float)i;
 
-			vertices[vertexCounter * 3 + 0] = cosf(currentAngle) * scale;
+			vertices[vertexCounter * 3 + 0] = cosf(currentAngle);
 			vertices[vertexCounter * 3 + 1] = 0.0f;
-			vertices[vertexCounter * 3 + 2] = sinf(currentAngle) * scale;
+			vertices[vertexCounter * 3 + 2] = sinf(currentAngle);
 
 			normals[vertexCounter * 3 + 0] = 0.0f;
 			normals[vertexCounter * 3 + 1] = 1.0f;
@@ -413,13 +413,13 @@ int main(int argc, char *argv[])
 				size_t normalIndex = (i * (numberSlices + 1) + j) * 3;
 				size_t texCoordsIndex = (i * (numberSlices + 1) + j) * 2;
 
-				vertices[vertexIndex + 0] = scale * sinf(angleStep * (float)i) * sinf(angleStep * (float)j);
-				vertices[vertexIndex + 1] = scale * cosf(angleStep * (float)i);
-				vertices[vertexIndex + 2] = scale * sinf(angleStep * (float)i) * cosf(angleStep * (float)j);
+				vertices[vertexIndex + 0] = sinf(angleStep * (float)i) * sinf(angleStep * (float)j);
+				vertices[vertexIndex + 1] = cosf(angleStep * (float)i);
+				vertices[vertexIndex + 2] = sinf(angleStep * (float)i) * cosf(angleStep * (float)j);
 
-				normals[normalIndex + 0] = vertices[vertexIndex + 0] / scale;
-				normals[normalIndex + 1] = vertices[vertexIndex + 1] / scale;
-				normals[normalIndex + 2] = vertices[vertexIndex + 2] / scale;
+				normals[normalIndex + 0] = vertices[vertexIndex + 0];
+				normals[normalIndex + 1] = vertices[vertexIndex + 1];
+				normals[normalIndex + 2] = vertices[vertexIndex + 2];
 
 				texCoords[texCoordsIndex + 0] = (float)j / (float)numberSlices;
 				texCoords[texCoordsIndex + 1] = 1.0f - (float)i / (float)numberParallels;
@@ -439,8 +439,8 @@ int main(int argc, char *argv[])
     }
     else if (primitive == "torus")
     {
-    	float outerRadius = scale;
-    	float innerRadius = scale / 4.0f;
+    	float outerRadius = 1.0f;
+    	float innerRadius = 1.0f / 4.0f;
     	float torusRadius = (outerRadius - innerRadius) / 2.0f;
     	float centerRadius = outerRadius - torusRadius;
 
